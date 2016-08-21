@@ -221,7 +221,7 @@ namespace AllJoyn.EcobeeDSB
             foreach (var item in t.thermostatList)
             {
                 EcobeeThermostatDevice thermostat = new EcobeeThermostatDevice(client, item);
-                ecobeeDevices[thermostat.SensorId] = thermostat;
+                ecobeeDevices.Add(thermostat.SerialNumber, thermostat);
                 thermostat.UpdateThermostat(item);
                 AllJoynDsbServiceManager.Current.AddDevice(thermostat);
                 //found.Add(d);
@@ -233,16 +233,17 @@ namespace AllJoyn.EcobeeDSB
                     if (n.Count() == 1)
                         deviceName = n.First();
                     var d = new EcobeeDevice(deviceName, device,
-                        item.brand, item.modelNumber, item.thermostatRev, "eb" + item.identifier + device.name + device.deviceId,
+                        item.brand, item.modelNumber, item.thermostatRev, "eb" + item.identifier + device.name + ":" + device.deviceId,
                         item.name + " - " + device.name);
-                    ecobeeDevices[d.SensorId] = d;
+                    ecobeeDevices.Add(d.SerialNumber, d);
                     AllJoynDsbServiceManager.Current.AddDevice(d);
                     //found.Add(d);
                 }
                 foreach (var sensor in item.remoteSensors)
                 {
-                    if (ecobeeDevices.ContainsKey(sensor.id))
-                        ecobeeDevices[sensor.id].UpdateReadings(sensor, false);
+                    string id = "eb" + item.identifier + sensor.id;
+                    if (ecobeeDevices.ContainsKey(id))
+                        ecobeeDevices[id].UpdateReadings(sensor, false);
                 }
             }
             StartUpdateLoop(token);
@@ -271,12 +272,13 @@ namespace AllJoyn.EcobeeDSB
                 }
                 foreach (var item in t.thermostatList)
                 {
-                    var thermostat = ecobeeDevices.Values.OfType<EcobeeThermostatDevice>().Where(th => th.SerialNumber == "eb" + item.identifier).FirstOrDefault();
+                    var thermostat = ecobeeDevices.Values.OfType<EcobeeThermostatDevice>().Where(th => th.SerialNumber == "eb" + item.identifier + "ei:0").FirstOrDefault();
                     thermostat?.UpdateThermostat(item);
                     foreach (var sensor in item.remoteSensors)
                     {
-                        if (ecobeeDevices.ContainsKey(sensor.id))
-                            ecobeeDevices[sensor.id].UpdateReadings(sensor);
+                        string id = "eb" + item.identifier + sensor.id;
+                        if (ecobeeDevices.ContainsKey(id))
+                            ecobeeDevices[id].UpdateReadings(sensor);
                     }
                 }
             }

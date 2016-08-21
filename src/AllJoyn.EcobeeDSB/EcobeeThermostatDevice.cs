@@ -17,13 +17,13 @@ namespace AllJoyn.EcobeeDSB
 
         public EcobeeThermostatDevice(Ecobee.EcobeeClient client, Ecobee.Thermostat thermostat)
             : base(thermostat.name, thermostat.devices.Where(d => d.deviceId == 0).FirstOrDefault(),
-                  thermostat.brand, thermostat.modelNumber, thermostat.thermostatRev, "eb" + thermostat.identifier, "")
+                  thermostat.brand, thermostat.modelNumber, thermostat.thermostatRev, "eb" + thermostat.identifier + "ei:0", "")
         {
             _client = client;
             _thermostat = thermostat;
             Icon = new AdapterIcon(new Uri("ms-appx:///AllJoyn.EcobeeDSB/Icons/ecobee3.png"));
             AdapterBusObject abo = new AdapterBusObject("Operation");
-            abo.Interfaces.Add(CreateHvacFanMode(0));
+            abo.Interfaces.Add(_hvacMode = CreateHvacFanMode(0));
             BusObjects.Add(abo);
             UpdateThermostat(_thermostat, false);
             // TODO:
@@ -34,7 +34,7 @@ namespace AllJoyn.EcobeeDSB
             // org.alljoyn.SmartSpaces.Operation.ResourceSaving
         }
 
-        private static AdapterInterface CreateHvacFanMode(ushort currentMode)
+        private AdapterInterface CreateHvacFanMode(ushort currentMode)
         {
             AdapterInterface iface = new AdapterInterface("org.alljoyn.SmartSpaces.Operation.HvacFanMode");
             // iface.Annotations.Add("org.alljoyn.Bus.Enum.Mode.Value.Auto", "0");
@@ -48,7 +48,7 @@ namespace AllJoyn.EcobeeDSB
             return iface;
         }
 
-        private static AllJoynStatusCode OnHvacFanModeSet(object arg)
+        private AllJoynStatusCode OnHvacFanModeSet(object arg)
         {
             return AllJoynStatusCode.Ok;
             // throw new NotImplementedException();

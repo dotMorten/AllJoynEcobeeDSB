@@ -127,7 +127,7 @@ namespace Ecobee
         [DataMember] public string thermostatRev { get; set; }
         [DataMember] public Device[] devices { get; set; }
         [DataMember] public RemoteSensor[] remoteSensors { get; set; }
-        [DataMember]
+        [DataMember(Name="settings")]
         public Settings Settings { get; set; }
     }
 
