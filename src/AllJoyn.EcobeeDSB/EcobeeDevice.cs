@@ -92,7 +92,7 @@ namespace AllJoyn.EcobeeDSB
                         f = Math.Round(f, 1);
                         v = f;
                     }
-                    if (attr.Value.Data != v)
+                    if (!object.Equals(attr.Value.Data, v))
                     {
                         attr.Value.Data = v;
                         if(raiseSignalChanged)
